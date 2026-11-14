@@ -1,42 +1,46 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-</head>
-<body>
-    {% extends "learning_logs/base.html"%}
+{% extends "learning_logs/base.html" %}
 
-    {% block content %}
+{% block title %}{{ topic }} - Learning Log{% endblock title %}
 
-        <p>Tópico: {{ topic }}</p>
+{% block content %}
+    <a class="back" href="{% url 'topics' %}">&larr; Tópicos</a>
 
-        <p>Entradas:</p>
+    <div class="page-head">
+        <h1>{{ topic }}</h1>
+        <a class="btn" href="{% url 'new_entry' topic.id %}">Nova anotação</a>
+    </div>
 
-        <p><a href="{% url 'new_entry' topic.id %}">Adicionar entrada</a></p>
-
-        <ul>
+    {% if entries %}
+        <ul class="entries">
             {% for entry in entries %}
-            
-                <li>
-                    <p>{{ entry.date_added | date:'M d, Y H:i'}}</p>
-                    <p>{{ entry.text | linebreaks}}</p>
-                    <p><a href="{% url 'edit_entry' entry.id %}">Editar entrada</a></p>
-                    <p><a href="{% url 'delete_entry' entry.id %}">Excluir entrada</a></p>
-                </li>
+                <li class="entry">
+                    <p class="entry__date">
+                        <time datetime="{{ entry.date_added|date:'c' }}">{{ entry.date_added|date:'d/m/Y' }}</time>
+                        <time datetime="{{ entry.date_added|date:'c' }}">{{ entry.date_added|date:'H:i' }}</time>
+                    </p>
 
-            {% empty %}
-                
-                <li>
-                    <p>Não há registro.</p>
+                    <div>
+                        <div class="entry__text">{{ entry.text|linebreaks }}</div>
+
+                        <div class="entry__actions">
+                            <a class="link-btn" href="{% url 'edit_entry' entry.id %}">Editar</a>
+                            <form class="inline-form" action="{% url 'delete_entry' entry.id %}" method="post" data-confirm="Excluir esta anotação?">
+                                {% csrf_token %}
+                                <button type="submit" class="link-btn link-btn--danger">Excluir</button>
+                            </form>
+                        </div>
+                    </div>
                 </li>
-            
             {% endfor %}
         </ul>
+    {% else %}
+        <p class="muted">Nenhuma anotação neste tópico ainda. Escreva a primeira.</p>
+    {% endif %}
 
-        <p><a href="{% url 'delete_topic' topic.id %}">Excluir tópico</a></p>
-
-    {% endblock content %}
-</body>
-</html>
+    <div class="danger-zone">
+        <form class="inline-form" action="{% url 'delete_topic' topic.id %}" method="post" data-confirm="Excluir este tópico e todas as anotações dele?">
+            {% csrf_token %}
+            <button type="submit" class="link-btn link-btn--danger">Excluir tópico</button>
+        </form>
+    </div>
+{% endblock content %}

@@ -5,11 +5,12 @@ class TopicForm(forms.ModelForm):
     class Meta:
         model = Topic
         fields = ['text']
-        label = {'text' : ''}
+        labels = {'text' : ''}
+        widgets = {'text' : forms.TextInput(attrs={'placeholder': 'Ex.: Python'})}
 
 class EntryForm(forms.ModelForm):
     class Meta:
         model = Entry
         fields = ['text']
         labels = {'text' : ''}
-        widget = {'text' : forms.Textarea(attrs={'col':80})}
+        widgets = {'text' : forms.Textarea(attrs={'rows': 10, 'placeholder': 'O que você aprendeu?'})}
